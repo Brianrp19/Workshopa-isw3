@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Course</title>
+    <script>
+        function createCourse() {
+            const name = document.getElementById("name").value;
+            const credits = Number(document.getElementById("credits").value);
+
+            fetch("http://localhost:3001/course", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, credits })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("result").innerHTML = JSON.stringify(data);
+                })
+                .catch(err => console.log(err));
+        }
+    </script>
+</head>
+
+<body>
+    <h2>Create Course</h2>
+
+    <label>Name:</label>
+    <input id="name" type="text" />
+
+    <br /><br />
+
+    <label>Credits:</label>
+    <input id="credits" type="number" />
+
+    <br /><br />
+
+    <button onclick="createCourse()">Create</button>
+
+    <h3>Result:</h3>
+    <div id="result"></div>
+</body>
+
+</html>

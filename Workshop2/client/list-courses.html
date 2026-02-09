@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>List Courses</title>
+    <script>
+        function listCourses() {
+            fetch("http://localhost:3001/course")
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("result").innerHTML = JSON.stringify(data);
+                })
+                .catch(err => console.log(err));
+        }
+    </script>
+</head>
+
+<body>
+    <h2>List Courses</h2>
+    <button onclick="listCourses()">Load Courses</button>
+
+    <h3>Result:</h3>
+    <div id="result"></div>
+</body>
+
+</html>
