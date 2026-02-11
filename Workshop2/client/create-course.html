@@ -18,6 +18,8 @@
                 .then(res => res.json())
                 .then(data => {
                     document.getElementById("result").innerHTML = JSON.stringify(data);
+                    document.getElementById("name").value = "";
+                    document.getElementById("credits").value = "";
                 })
                 .catch(err => console.log(err));
         }
@@ -27,17 +29,11 @@
 <body>
     <h2>Create Course</h2>
 
-    <label>Name:</label>
-    <input id="name" type="text" />
-
-    <br /><br />
-
-    <label>Credits:</label>
-    <input id="credits" type="number" />
-
-    <br /><br />
+    Name: <input id="name" type="text" /><br><br>
+    Credits: <input id="credits" type="number" /><br><br>
 
     <button onclick="createCourse()">Create</button>
+    <a href="/">View List</a>
 
     <h3>Result:</h3>
     <div id="result"></div>
