@@ -6,22 +6,91 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>List Courses</title>
     <script>
+        window.onload = function () {
+            listCourses();
+        };
+
         function listCourses() {
             fetch("http://localhost:3001/course")
                 .then(res => res.json())
                 .then(data => {
-                    document.getElementById("result").innerHTML = JSON.stringify(data);
+                    let html = '<table border="1">';
+                    html += '<tr><th>ID</th><th>Name</th><th>Credits</th><th>Actions</th></tr>';
+
+                    data.forEach(course => {
+                        html += `<tr>
+                            <td>${course._id}</td>
+                            <td>${course.name}</td>
+                            <td>${course.credits}</td>
+                            <td>
+                                <button onclick="editCourse('${course._id}', '${course.name}', ${course.credits})">Edit</button>
+                                <button onclick="deleteCourse('${course._id}')">Delete</button>
+                            </td>
+                        </tr>`;
+                    });
+
+                    html += '</table>';
+                    document.getElementById("result").innerHTML = html;
                 })
                 .catch(err => console.log(err));
+        }
+
+        function editCourse(id, name, credits) {
+            document.getElementById("editId").value = id;
+            document.getElementById("editName").value = name;
+            document.getElementById("editCredits").value = credits;
+            document.getElementById("editForm").style.display = "block";
+        }
+
+        function updateCourse() {
+            const id = document.getElementById("editId").value;
+            const name = document.getElementById("editName").value;
+            const credits = Number(document.getElementById("editCredits").value);
+
+            fetch(`http://localhost:3001/course/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, credits })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("editForm").style.display = "none";
+                    listCourses();
+                })
+                .catch(err => console.log(err));
+        }
+
+        function deleteCourse(id) {
+            if (confirm("Delete this course?")) {
+                fetch(`http://localhost:3001/course/${id}`, {
+                    method: "DELETE"
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        listCourses();
+                    })
+                    .catch(err => console.log(err));
+            }
         }
     </script>
 </head>
 
 <body>
     <h2>List Courses</h2>
-    <button onclick="listCourses()">Load Courses</button>
+    <button onclick="listCourses()">Reload</button>
+    <a href="/home">Create Course</a>
+    <br><br>
 
-    <h3>Result:</h3>
+    <div id="editForm" style="display:none;">
+        <h3>Edit Course</h3>
+        <input type="hidden" id="editId" />
+        Name: <input type="text" id="editName" /><br>
+        Credits: <input type="number" id="editCredits" /><br>
+        <button onclick="updateCourse()">Update</button>
+        <button onclick="document.getElementById('editForm').style.display='none'">Cancel</button>
+        <br><br>
+    </div>
+
     <div id="result"></div>
 </body>
 
