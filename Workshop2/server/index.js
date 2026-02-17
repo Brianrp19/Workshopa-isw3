@@ -5,39 +5,44 @@ const mongoose = require('mongoose');
 const path = require('path');
 const Course = require('./models/course');
 
+// Conexión a la base de datos MongoDB
 mongoose.connect('mongodb://127.0.0.1:27017/workshop2');
 const database = mongoose.connection;
 
+// Manejo de errores de la base de datos
 database.on('error', (error) => {
     console.log(error)
 });
 
+// Confirmación de conexión exitosa
 database.once('connected', () => {
     console.log('Database Connected');
 });
 
 const app = express();
 
-//middlewares
+// Middlewares: configuración para procesar datos JSON y permitir CORS
 app.use(bodyParser.json());
 app.use(cors({
     domains: '*',
     methods: '*'
 }));
 
-//routes
+// --- RUTAS DE PÁGINAS HTML ---
 
-// Páginas HTML
-
+// Ruta raíz: Sirve la página de lista de cursos
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'client', 'list-courses.html'))
 });
 
+// Ruta /home: Sirve la página para crear cursos
 app.get('/home', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'client', 'create-course.html'))
 });
 
-// POST - crear course
+//  RUTAS DE LA API (CRUD) 
+
+// POST: Crea un nuevo curso en la base de datos
 app.post('/course', async (req, res) => {
     const course = new Course({
         name: req.body.name,
@@ -54,7 +59,7 @@ app.post('/course', async (req, res) => {
     }
 });
 
-// GET - traer 1 (si viene id) o todos
+// GET: Obtiene todos los cursos o uno específico si se envía un ID por parámetro
 app.get('/course', async (req, res) => {
     try {
         if (!req.query.id) {
@@ -69,7 +74,7 @@ app.get('/course', async (req, res) => {
     }
 });
 
-// PUT - actualizar course por id (ruta /course/:id)
+// PUT: Actualiza un curso existente buscando por su ID
 app.put('/course/:id', async (req, res) => {
     try {
         const id = req.params.id;
@@ -80,7 +85,7 @@ app.put('/course/:id', async (req, res) => {
                 name: req.body.name,
                 credits: req.body.credits
             },
-            { new: true }
+            { new: true } // Retorna el documento actualizado
         );
 
         if (!updated) {
@@ -94,7 +99,7 @@ app.put('/course/:id', async (req, res) => {
     }
 });
 
-// DELETE - eliminar course por id
+// DELETE: Elimina un curso de la base de datos por su ID
 app.delete('/course/:id', async (req, res) => {
     try {
         const id = req.params.id;
@@ -112,5 +117,5 @@ app.delete('/course/:id', async (req, res) => {
     }
 });
 
-//start the app
+// Inicia el servidor en el puerto 3001
 app.listen(3001, () => console.log(`UTN API service listening on port 3001!`))
