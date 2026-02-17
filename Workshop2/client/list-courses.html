@@ -1,21 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>List Courses</title>
+    <title>Lista de Cursos</title>
     <script>
+        // Se ejecuta al cargar la página para mostrar los cursos inmediatamente
         window.onload = function () {
             listCourses();
         };
 
+        // Función para obtener todos los cursos desde la API y mostrarlos en una tabla
         function listCourses() {
             fetch("http://localhost:3001/course")
                 .then(res => res.json())
                 .then(data => {
                     let html = '<table border="1">';
-                    html += '<tr><th>ID</th><th>Name</th><th>Credits</th><th>Actions</th></tr>';
+                    html += '<tr><th>ID</th><th>Nombre</th><th>Créditos</th><th>Acciones</th></tr>';
 
                     data.forEach(course => {
                         html += `<tr>
@@ -23,8 +25,8 @@
                             <td>${course.name}</td>
                             <td>${course.credits}</td>
                             <td>
-                                <button onclick="editCourse('${course._id}', '${course.name}', ${course.credits})">Edit</button>
-                                <button onclick="deleteCourse('${course._id}')">Delete</button>
+                                <button onclick="editCourse('${course._id}', '${course.name}', ${course.credits})">Editar</button>
+                                <button onclick="deleteCourse('${course._id}')">Eliminar</button>
                             </td>
                         </tr>`;
                     });
@@ -35,6 +37,7 @@
                 .catch(err => console.log(err));
         }
 
+        // Carga los datos de un curso en el formulario de edición
         function editCourse(id, name, credits) {
             document.getElementById("editId").value = id;
             document.getElementById("editName").value = name;
@@ -42,6 +45,7 @@
             document.getElementById("editForm").style.display = "block";
         }
 
+        // Envía una petición PUT a la API para actualizar un curso
         function updateCourse() {
             const id = document.getElementById("editId").value;
             const name = document.getElementById("editName").value;
@@ -55,19 +59,20 @@
                 .then(res => res.json())
                 .then(data => {
                     document.getElementById("editForm").style.display = "none";
-                    listCourses();
+                    listCourses(); // Recarga la lista después de actualizar
                 })
                 .catch(err => console.log(err));
         }
 
+        // Envía una petición DELETE a la API para eliminar un curso
         function deleteCourse(id) {
-            if (confirm("Delete this course?")) {
+            if (confirm("¿Estás seguro de eliminar este curso?")) {
                 fetch(`http://localhost:3001/course/${id}`, {
                     method: "DELETE"
                 })
                     .then(res => res.json())
                     .then(data => {
-                        listCourses();
+                        listCourses(); // Recarga la lista después de eliminar
                     })
                     .catch(err => console.log(err));
             }
@@ -76,21 +81,23 @@
 </head>
 
 <body>
-    <h2>List Courses</h2>
-    <button onclick="listCourses()">Reload</button>
-    <a href="/home">Create Course</a>
+    <h2>Lista de Cursos</h2>
+    <button onclick="listCourses()">Recargar</button>
+    <a href="/home">Crear Nuevo Curso</a>
     <br><br>
 
+    <!-- Formulario oculto para editar cursos -->
     <div id="editForm" style="display:none;">
-        <h3>Edit Course</h3>
+        <h3>Editar Curso</h3>
         <input type="hidden" id="editId" />
-        Name: <input type="text" id="editName" /><br>
-        Credits: <input type="number" id="editCredits" /><br>
-        <button onclick="updateCourse()">Update</button>
-        <button onclick="document.getElementById('editForm').style.display='none'">Cancel</button>
+        Nombre: <input type="text" id="editName" /><br>
+        Créditos: <input type="number" id="editCredits" /><br>
+        <button onclick="updateCourse()">Actualizar</button>
+        <button onclick="document.getElementById('editForm').style.display='none'">Cancelar</button>
         <br><br>
     </div>
 
+    <!-- Div donde se renderiza la tabla de cursos -->
     <div id="result"></div>
 </body>
 

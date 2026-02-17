@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create Course</title>
+    <title>Crear Curso</title>
     <script>
+        // Función para enviar una petición POST a la API y crear un nuevo curso
         function createCourse() {
             const name = document.getElementById("name").value;
             const credits = Number(document.getElementById("credits").value);
@@ -17,7 +18,8 @@
             })
                 .then(res => res.json())
                 .then(data => {
-                    document.getElementById("result").innerHTML = JSON.stringify(data);
+                    // Muestra el resultado de la creación y limpia los campos
+                    document.getElementById("result").innerHTML = "Curso creado: " + JSON.stringify(data);
                     document.getElementById("name").value = "";
                     document.getElementById("credits").value = "";
                 })
@@ -27,15 +29,15 @@
 </head>
 
 <body>
-    <h2>Create Course</h2>
+    <h2>Crear Nuevo Curso</h2>
 
-    Name: <input id="name" type="text" /><br><br>
-    Credits: <input id="credits" type="number" /><br><br>
+    Nombre: <input id="name" type="text" /><br><br>
+    Créditos: <input id="credits" type="number" /><br><br>
 
-    <button onclick="createCourse()">Create</button>
-    <a href="/">View List</a>
+    <button onclick="createCourse()">Crear</button>
+    <a href="/">Ver Lista de Cursos</a>
 
-    <h3>Result:</h3>
+    <h3>Resultado:</h3>
     <div id="result"></div>
 </body>
 
