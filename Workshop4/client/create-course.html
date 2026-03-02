@@ -1,0 +1,186 @@
+<!-- 
+    Página para la creación de nuevos cursos.
+    Permite ingresar el nombre, código, descripción y seleccionar un profesor.
+-->
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Curso</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .nav {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav a {
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="/">← Volver a la Lista</a>
+            <a href="/teachers">Gestionar Profesores</a>
+            <button onclick="logout()"
+                style="float: right; background: #dc3545; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px;">Cerrar
+                Sesión</button>
+        </div>
+
+        <h2>Crear Nuevo Curso</h2>
+
+        <div class="card">
+            <div class="form-group">
+                <label>Nombre del Curso</label>
+                <input id="name" type="text" placeholder="Ej: Programación III" />
+            </div>
+            <div class="form-group">
+                <label>Código</label>
+                <input id="code" type="text" placeholder="Ej: PROG3" />
+            </div>
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="description" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Profesor</label>
+                <select id="teacherId">
+                    <option value="">Cargando profesores...</option>
+                </select>
+            </div>
+
+            <button onclick="createCourse()">Crear Curso</button>
+        </div>
+
+        <h3 style="margin-top: 2rem;">Resultado:</h3>
+        <div id="result" style="color: #059669; font-weight: 500;"></div>
+    </div>
+
+    <script>
+        // Si no hay token, al login
+        if (!localStorage.getItem("token")) {
+            window.location.href = "login.html";
+        }
+
+        window.onload = loadTeachers;
+
+        function handleError(res) {
+            if (res.status === 401) {
+                localStorage.removeItem("token");
+                window.location.href = "login.html";
+            }
+            return res.json();
+        }
+
+        // Carga la lista de profesores al iniciar la página para llenar el dropdown
+        function loadTeachers() {
+            fetch("http://localhost:3001/teacher", {
+                headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
+            })
+                .then(res => handleError(res))
+                .then(data => {
+                    const select = document.getElementById("teacherId");
+                    if (data.length === 0) {
+                        select.innerHTML = '<option value="">No hay profesores, cree uno primero</option>';
+                        return;
+                    }
+                    select.innerHTML = data.map(t => `<option value="${t._id}">${t.nombre} ${t.apellidos}</option>`).join('');
+                });
+        }
+
+        // Envía los datos del formulario al servidor para crear un nuevo curso
+        function createCourse() {
+            const body = {
+                name: document.getElementById("name").value,
+                code: document.getElementById("code").value,
+                description: document.getElementById("description").value,
+                teacherId: document.getElementById("teacherId").value
+            };
+
+            if (!body.teacherId) {
+                alert("Debe seleccionar un profesor.");
+                return;
+            }
+
+            fetch("http://localhost:3001/course", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + localStorage.getItem("token")
+                },
+                body: JSON.stringify(body)
+            })
+                .then(res => handleError(res))
+                .then(data => {
+                    document.getElementById("result").innerHTML = "✓ Curso creado exitosamente";
+                    document.getElementById("name").value = "";
+                    document.getElementById("code").value = "";
+                    document.getElementById("description").value = "";
+                })
+                .catch(err => {
+                    alert("Error: " + err.message);
+                });
+        }
+
+        function logout() {
+            localStorage.removeItem("token");
+            window.location.href = "/login";
+        }
+    </script>
+</body>
+
+</html>
