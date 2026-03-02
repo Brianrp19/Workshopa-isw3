@@ -82,7 +82,7 @@ app.get('/teacher', async (req, res) => {
     }
 });
 
-// Para actualizar los datos de alguien
+// Para actualizar los datos de alguiens
 app.put('/teacher/:id', async (req, res) => {
     try {
         const id = req.params.id;
